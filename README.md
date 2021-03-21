@@ -23,4 +23,4 @@ Copyright & License
 ----
 
 Copyright (C) 2018 - 2021 Sio Kreuzer.
-Licensed under the terms of the GNU GPLv2+. See COPYING for full license text.
+Licensed under the terms of the GNU GPLv2+. See COPYING.txt for full license text.
