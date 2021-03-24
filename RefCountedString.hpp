@@ -60,7 +60,6 @@ struct RefCountedString
     {
         unref();
         if ( refcount() == 0 ) {
-            fprintf( stdout, "refcount == 0, deallocating string %s\n", str );
             free( reinterpret_cast< void* >( const_cast< char* >( str ) - sizeof( uint64_t ) ) );
         }
     }
