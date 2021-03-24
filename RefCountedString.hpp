@@ -26,7 +26,7 @@ struct RefCountedString
 {
     char const* const str;
 
-    uint64_t& refcount()
+    inline uint64_t& refcount()
     {
         return *( reinterpret_cast< uint64_t* >( const_cast< char* >( str ) - sizeof( uint64_t ) ) );
     }
@@ -64,19 +64,19 @@ struct RefCountedString
         }
     }
 
-    void ref()
+    inline void ref()
     {
         refcount()++;
     }
 
-    void unref()
+    inline void unref()
     {
         if ( refcount() > 0 ) {
             refcount()--;
         }
     }
 
-    char const* c_str()
+    inline char const* c_str() const
     {
         return str;
     }
@@ -90,3 +90,12 @@ struct RefCountedString
 };
 
 }
+
+template<>
+struct std::hash< LibSio::RefCountedString >
+{
+    size_t operator()( const LibSio::RefCountedString& x ) const
+    {
+        return std::_Hash_impl::hash( x.c_str(), strlen( x.c_str() ) );
+    }
+};

@@ -19,6 +19,8 @@
 
 #include "utils.hpp"
 
+#include <bits/hash_bytes.h>
+
 #include <cassert>
 #include <cstring>
 #include <cstdlib>
@@ -31,17 +33,51 @@
 namespace LibSio
 {
 
+namespace detail
+{
+
+template< typename C >
+struct strtools
+{
+    static void strncpy( C* dst, const C* src, size_t const count )
+    {
+        for ( size_t i = 0; i < count; i++ ) {
+            new( dst + i ) C( src[i] );
+        }
+    }
+
+    static size_t strlen( const C* const x )
+    {
+        C null {};
+        size_t n = 0;
+        for ( ; x[n] != null; n++ );
+        return n;
+    }
+};
+
+template<>
+struct strtools< char >
+{
+    static size_t strlen( char const* const x )
+    {
+        return ::strlen( x );
+    }
+
+    static void strncpy( char* dst, const char* src, size_t count )
+    {
+        ::strncpy( dst, src, count );
+    }
+};
+
+};
+
 template< typename C >
 struct StringT
 {
   private:
     static size_t strlen( const C* const x )
     {
-        char null[sizeof( C )];
-        memset( null, 0, sizeof( C ) );
-        size_t n = 0;
-        for ( ; 0 != memcmp( x + n, null, sizeof( C ) ); n++ );
-        return n;
+        return detail::strtools< C >::strlen( x );
     }
 
     constexpr static const C emptystr {};
@@ -57,12 +93,8 @@ struct StringT
     {
         size_t len = strlen( x );
         str = ( C* ) calloc( len + 1, sizeof( C ) );
-        for ( size_t i = 0; i < len; i++ ) {
-            new( str + i ) C( x[i] );
-        }
-        //memcpy( str, x, len * sizeof( C ) );
+        detail::strtools< C >::strncpy( str, x, len );
         new( str + len ) C( emptystr );
-        //memset( str + len, 0, sizeof( C ) );
     }
 
     StringT( C* const x )
@@ -183,7 +215,6 @@ struct std::hash< LibSio::StringT< C > >
 {
     size_t operator()( const LibSio::StringT< C >& x ) const
     {
-        std::hash< basic_string< C > > h;
-        return h( basic_string< C >( x.c_str() ) );
+        return std::_Hash_impl::hash( x.c_str(), x.length() );
     }
 };
