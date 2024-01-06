@@ -5,7 +5,7 @@ Typically intended to be filled at one point in time and then only accessed (see
 The String template is intended as a deliberately more unfriendly variant of std::string that occupies only the size of a pointer.
 
 Usage
-----
+-----
 
 Headers only - just copy them into your project, include them and you ought to be good to go. Requires C++17 (preferably with GNU extensions; use either clang or gcc).
 
@@ -19,8 +19,13 @@ A few things to keep in mind:
 * This library should not throw any exceptions, ever. Failures are either signaled via return codes, or silently tolerated (as in the case where one removes an element that doesn't exist).
 * `Optional` somewhat replicates the interface of Haskell's `Maybe` type.
 
+Notable further work relating to `HashMap`
+------------------------------------------
+
+The [Odin programming language](https://odin-lang.org) has a built-in `map` type that appears to be heavily based on if not this `HashMap` implementation, then at least the same ideas for data layout, map access, cacheline alignment, struct size etc. Said implementation is much easier to understand, comprehensive, has considerably fewer restrictions and is of generally higher quality. It lacks "fibonacci hashing" (i.e. the LCG used here to deal with `std::hash` on integers often being implemented as the identity function), and uses a proper hash function instead to begin with. Should you wish to implement such a hashmap type, I heavily recommend referring to the Odin implementation instead of my implementation.
+
 Copyright & License
-----
+-------------------
 
 Copyright (C) 2018 - 2021 Sio Kreuzer.
 Licensed under the terms of the GNU GPLv2+. See COPYING.txt for full license text.
